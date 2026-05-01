@@ -14,7 +14,7 @@ fn main() {
     let _guard = rt.enter();
 
     let app = Application::builder()
-        .application_id("com.ollama.ui")
+        .application_id("com.llamachat.ui")
         .build();
 
     app.connect_startup(|_| load_css());
@@ -94,7 +94,7 @@ fn build_ui(app: &Application) {
 
     let window = ApplicationWindow::builder()
         .application(app)
-        .title("Ollama UI")
+        .title("Llama Chat UI")
         .content(&content)
         .default_width(800)
         .default_height(600)
