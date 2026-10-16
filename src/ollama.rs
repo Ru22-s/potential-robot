@@ -72,4 +72,52 @@ mod tests {
         let json = serde_json::to_string(&msg).unwrap();
         assert_eq!(json, r#"{"role":"user","content":"hello"}"#);
     }
+
+    #[test]
+    fn test_chat_message_deserialization() {
+        let json = r#"{"role":"assistant","content":"Hi there!"}"#;
+        let msg: ChatMessage = serde_json::from_str(json).unwrap();
+        assert_eq!(msg.role, "assistant");
+        assert_eq!(msg.content, "Hi there!");
+    }
+
+    #[test]
+    fn test_chat_request_serialization() {
+        let req = ChatRequest {
+            model: "llama3".to_string(),
+            messages: vec![
+                ChatMessage {
+                    role: "user".to_string(),
+                    content: "Hello!".to_string(),
+                },
+            ],
+            stream: false,
+        };
+        let json = serde_json::to_string(&req).unwrap();
+        assert!(json.contains(r#""model":"llama3""#));
+        assert!(json.contains(r#""stream":false"#));
+        assert!(json.contains(r#""role":"user""#));
+        assert!(json.contains(r#""content":"Hello!""#));
+    }
+
+    #[test]
+    fn test_chat_response_deserialization() {
+        let json = r#"{
+            "message": {
+                "role": "assistant",
+                "content": "Hello! How can I help you today?"
+            },
+            "done": true
+        }"#;
+        let res: ChatResponse = serde_json::from_str(json).unwrap();
+        assert!(res.done);
+        assert_eq!(res.message.role, "assistant");
+        assert_eq!(res.message.content, "Hello! How can I help you today?");
+    }
+
+    #[test]
+    fn test_ollama_client_new() {
+        let client = OllamaClient::new("http://localhost:11434".to_string());
+        assert_eq!(client.base_url, "http://localhost:11434");
+    }
 }
