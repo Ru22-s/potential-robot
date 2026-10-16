@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+/// Represents a single message in a conversation.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct ChatMessage {
     pub role: String,
@@ -7,6 +8,16 @@ pub struct ChatMessage {
 }
 
 impl ChatMessage {
+    /// Creates a system role message.
+    #[allow(dead_code)]
+    pub fn system(content: impl Into<String>) -> Self {
+        Self {
+            role: "system".to_string(),
+            content: content.into(),
+        }
+    }
+
+    /// Creates a user role message.
     pub fn user(content: impl Into<String>) -> Self {
         Self {
             role: "user".to_string(),
@@ -14,6 +25,7 @@ impl ChatMessage {
         }
     }
 
+    /// Creates an assistant role message.
     pub fn assistant(content: impl Into<String>) -> Self {
         Self {
             role: "assistant".to_string(),
@@ -22,6 +34,7 @@ impl ChatMessage {
     }
 }
 
+/// Request payload sent to Ollama's `/api/chat` endpoint.
 #[derive(Serialize, Debug, Clone)]
 pub struct ChatRequest {
     pub model: String,
@@ -29,10 +42,26 @@ pub struct ChatRequest {
     pub stream: bool,
 }
 
+/// Response payload received from Ollama's `/api/chat` endpoint.
 #[derive(Deserialize, Debug, Clone)]
 pub struct ChatResponse {
     pub message: ChatMessage,
+    #[allow(dead_code)]
     pub done: bool,
+}
+
+/// Information about a single local model from Ollama.
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct ModelInfo {
+    pub name: String,
+    #[serde(default)]
+    pub model: String,
+}
+
+/// Response payload received from Ollama's `/api/tags` endpoint.
+#[derive(Deserialize, Debug, Clone)]
+pub struct ListModelsResponse {
+    pub models: Vec<ModelInfo>,
 }
 
 #[cfg(test)]
@@ -41,6 +70,10 @@ mod tests {
 
     #[test]
     fn test_chat_message_helpers() {
+        let s = ChatMessage::system("You are helpful.");
+        assert_eq!(s.role, "system");
+        assert_eq!(s.content, "You are helpful.");
+
         let u = ChatMessage::user("Hello");
         assert_eq!(u.role, "user");
         assert_eq!(u.content, "Hello");
@@ -74,5 +107,25 @@ mod tests {
         let res: ChatResponse = serde_json::from_str(json).unwrap();
         assert!(res.done);
         assert_eq!(res.message.content, "Response");
+    }
+
+    #[test]
+    fn test_list_models_response_deserialization() {
+        let json = r#"{
+            "models": [
+                {
+                    "name": "llama3:latest",
+                    "model": "llama3:latest"
+                },
+                {
+                    "name": "mistral:latest",
+                    "model": "mistral:latest"
+                }
+            ]
+        }"#;
+        let res: ListModelsResponse = serde_json::from_str(json).unwrap();
+        assert_eq!(res.models.len(), 2);
+        assert_eq!(res.models[0].name, "llama3:latest");
+        assert_eq!(res.models[1].name, "mistral:latest");
     }
 }

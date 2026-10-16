@@ -1,13 +1,17 @@
 # Llama Chat UI
 
-A simple, modern Rust desktop application to chat with local Ollama models.
+A clean, modern Rust desktop application to chat with local Ollama models.
 
 ## Features
 
-- Clean UI using GTK4 and Libadwaita
+- Clean UI built with GTK4 and Libadwaita
 - Connects to local Ollama API (default: `http://localhost:11434`)
-- Asynchronous communication with the Ollama model for responsive UI
-- Uses the `llama3` model by default (can be changed in source code)
+- Dynamic model selection dropdown (fetches available installed models via `/api/tags`)
+- Non-blocking asynchronous communication using Tokio and Libadwaita event loops
+- Visual typing indicator while waiting for responses
+- Error toast alerts via Libadwaita `ToastOverlay`
+- Copyable/selectable message bubbles with automatic text wrapping
+- Clear chat history button
 
 ## Dependencies
 
@@ -57,4 +61,10 @@ To build and run Llama Chat UI on Windows:
 ```bash
 cargo build
 cargo run
+```
+
+## Running Tests
+
+```bash
+cargo test
 ```
