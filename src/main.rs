@@ -1,3 +1,5 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
 use gtk4::prelude::*;
 use libadwaita::{Application, ApplicationWindow, HeaderBar};
 use gtk4::{Box, Orientation, Label, ListBox, ScrolledWindow, Entry, Button, SelectionMode, Align, CssProvider, glib};
